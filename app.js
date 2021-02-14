@@ -5,13 +5,11 @@ const searchBtn = document.getElementById("search-btn");
 const sliderBtn = document.getElementById("create-slider");
 const sliderContainer = document.getElementById("sliders");
 const searchInput = document.getElementById("search");
+const desc = document.getElementById("description");
+const goTop = document.getElementById("go-top");
 
 // selected image
 let sliders = [];
-
-{
-  /* <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}"> */
-}
 
 // If this key doesn't work
 // Find the name in the url and go to their website
@@ -20,6 +18,7 @@ const KEY = "15674931-a9d714b6e9d654524df198e00&q";
 
 // show images
 const showImages = (images) => {
+  closeImage();
   imagesArea.style.display = "block";
   gallery.innerHTML = "";
   // show gallery title
@@ -29,31 +28,20 @@ const showImages = (images) => {
 
     div.className = "col-lg-3 col-md-4 col-xs-6 img-item mb-2";
     div.innerHTML = ` 
-      
-        <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") onmouseover=hoverItem(alt) src="${image.webformatURL}" alt="${image.tags}">
-        
-     
-        
-
-
-        
+      <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}")  src="${image.webformatURL}" alt="${image.tags}" onmouseover=hoverItem(this,${image.likes},${image.favorites},${image.comments})>    
     `;
+
     gallery.appendChild(div);
   });
+  goTop.classList.add("d-block");
 };
 
 const getImages = (query) => {
   fetch(
-    // `https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`
-
-    `https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&page=2&per_page=10&pretty=true`
+    `https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`
   )
     .then((response) => response.json())
-    .then((data) =>
-      // console.log(data.hits)
-
-      showImages(data.hits)
-    )
+    .then((data) => showImages(data.hits))
     .catch((err) => console.log(err));
 };
 
@@ -105,7 +93,9 @@ const createSlider = () => {
     item.className = "slider-item";
     item.innerHTML = `<img class="w-100"
     src="${slide}"
-    alt="">`;
+    alt="">
+   
+    `;
     sliderContainer.appendChild(item);
   });
   changeSlide(0);
@@ -152,9 +142,24 @@ searchInput.addEventListener("change", displayImages);
 searchBtn.addEventListener("click", displayImages);
 
 sliderBtn.addEventListener("click", function () {
+  desc.innerHTML = "";
   createSlider();
 });
 
-const hoverItem = (txt) => {
-  console.log(txt);
+const hoverItem = (imageBody, likes, favorites, comments) => {
+  desc.innerHTML = `
+  <span class="hover-item-span" onclick=closeImage() class="badge rounded-pill bg-danger"><i class="fas fa-times fa-3x"></i></span>
+    <figure>
+      <img src=${imageBody.src}/>
+      <figcaption>
+        ${imageBody.alt}
+        <span class="hover-item-span"><i class="far fa-thumbs-up"></i> ${likes} <i class="far fa-star"></i> ${favorites} <i class="far fa-comment"></i> ${comments}</span>
+      </figcaption>
+    </figure>
+    
+`;
+};
+
+const closeImage = () => {
+  desc.innerHTML = "";
 };
